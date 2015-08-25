@@ -197,7 +197,7 @@ Nav Bar / Header
 
 
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-10">
       <!--***********************************************
       Main Keyboard Preview/Editor area
       ************************************************-->
@@ -257,19 +257,15 @@ Nav Bar / Header
     <!--***********************************************
     Editor controls
     ************************************************-->
-    <div class="col-lg-4">
+    <div class="col-lg-2">
       <!-- Tab strip -->
       <ul class="nav nav-tabs" ng-cloak>
-        <li ng-class="{active:selTab==0}"><a ng-click="selTab=0" data-toggle="tab"><i class="fa fa-edit"></i> Properties</a></li>
-        <li ng-class="{active:selTab==1}"><a ng-click="selTab=1" data-toggle="tab"><i class="fa fa-keyboard-o"></i> Keyboard Properties</a></li>
-        <li ng-class="{active:selTab==3}"><a ng-click="selTab=3" data-toggle="tab"><i class="fa fa-file-text-o"></i> Custom Styles</a></li>
-        <li ng-class="{active:selTab==2}"><a ng-click="selTab=2" data-toggle="tab"><i class="fa fa-code"></i> Raw data</a></li>
-        <li ng-class="{active:selTab==4}"><a ng-click="selTab=4" data-toggle="tab"><i class="fa fa-file-text-o"></i> Summary</a></li>
+        <li><a data-toggle="tab"><i class="fa fa-edit"></i> Properties</a></li>
       </ul>
-      <div id="tab-content" class='col-md-12 col-lg-12 row' ui-keydown="{esc:'focusKb()'}" ng-cloak>
+      <div id="right-tab-content" class='col-md-12 col-lg-12 row' ui-keydown="{esc:'focusKb()'}">
 
         <!-- PROPERTIES EDITOR -->
-        <div id="properties" ng-class="{hidden:selTab!=0}">
+        <div id="properties">
           <form class="form-horizontal col-sm-8 col-md-5 col-lg-5">
 
             <!-- Top Legend -->
@@ -542,289 +538,250 @@ Nav Bar / Header
             </div>
 
           </form>
-
-          <!-- Color Palette -->
-          <div class="col-md-4 col-lg-4" ng-class="{hidden:!palette.name}">
-            {{palette.name}} <a ng-href='{{palette.href}}' data-hint="{{palette.description}}" class="hint--top hint--rounded" target="_blank">(more info)</a>
-            <ul id="swatches" ng-class="{disabled:selectedKeys.length<1}">
-              <li ng-repeat="color in palette.colors"
-                 ng-style="{'background-color':color.css}"
-                 ng-click="clickSwatch(color,$event)"
-                 class="swatch"
-                 ng-class="{'selected-bg': color.css === multi.color, 'selected-fg': color.css === multi.default.textColor}"
-                 tooltip="{{color.name}}"
-                 ui-draggable="true" drag-channel="dragColor" drag="color">
-                   <div class='highlight fg'></div>
-                   <div class='highlight bg'></div>
-              </li>
-            </ul>
-            <alert type="warning" style="margin-top:10px;" ng-hide="paletteAlertHidden" close="paletteAlertHidden = true">
-              <i class="fa fa-info-circle"></i> Click on a swatch to set the color of the selected key(s), or Ctrl+Click to set the text color.  You can also drag color swatches to individual legends to set different colors for each one.
-            </alert>
-          </div>
-
-          <!-- Character Picker -->
-          <div class="col-md-6 col-lg-6" ng-class="{hidden:!picker.name}">
-            {{picker.name}} <a ng-if='picker.href' ng-href='{{picker.href}}' data-hint="{{picker.description}}" class="hint--top hint--rounded" target="_blank">(more info)</a>
-            <div class="col-md-12 col-lg-12" style="padding:4px 0px;">
-              <input id="picker-filter" class="form-control input-sm" type='text' ng-model="pickerFilter" placeholder="Filter"
-                     ng-change="pickerSelection = {}">
-            </div>
-            <div id="glyphScroller">
-              <ul id="glyphs" ng-class="{disabled:selectedKeys.length<1}">
-                <li ng-repeat="glyph in picker.glyphs | filter:pickerFilter"
-                   class="glyph"
-                   tooltip="{{glyph.name}}"
-                   ng-click="pickerSelect(glyph)"
-                   ng-bind-html="glyph.html"
-                   ng-class="{selected:pickerSelection===glyph}"
-                   ui-draggable="true" drag-channel="dragGlyph" drag="glyph">
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-12 col-lg-12" style="padding:4px 0px;">
-              <input id="picker-html" class="form-control input-sm" type='text'
-                    ng-model="pickerSelection.html" placeholder="No glyph selected"
-                    onClick="this.select();" readonly>
-            </div>
-            <alert type="warning" style="margin-top:40px;" ng-hide="pickerAlertHidden" close="pickerAlertHidden = true">
-              <i class="fa fa-info-circle"></i> Click on a glyph to see the HTML code for that glyph.  You can also drag glyphs to the legend edit-boxes to assign them to the legend.
-            </alert>
-          </div>
         </div>
-
-        <!-- KEYBOARD PROPERTIES EDITOR -->
-        <div id="kbdproperties" ng-class="{hidden:selTab!=1}">
-          <form class="form-horizontal col-sm-12 col-md-12 col-lg-12">
-
-            <!-- Keyboard Background -->
-            <div class="form-group form-group-sm">
-              <label class="control-label col-md-2 col-lg-1 text-nowrap" for="kbdcoloreditor">Case Background:</label>
-              <div class="col-md-10 col-lg-11">
-                <div class="form-inline">
-                  <!-- Color -->
-                  <kbd-color-picker picker-id="kbdcoloreditor"
-                                    ng-model="meta.backcolor"
-                                    ng-change="updateMeta('backcolor')"
-                                    ng-blur="validateMeta('backcolor')"
-                                    hint-text="Specify the background color for the keyboard."></kbd-color-picker>
-
-                  <!-- Background image-->
-                  <div class="form-group form-group-sm">
-                    <div class="input-group input-group-sm hint--top hint--rounded" data-hint="Specify the background texture for the keyboard.">
-                      <div class="btn-group btn-group-sm-form" dropdown>
-                        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{meta.background ? meta.background.name : 'No Texture'}} <b class="caret"></b></button>
-                        <ul class="dropdown-menu dropdown-select" role="menu">
-                          <li><a ng-click='setBackground()'>None</a></li>
-                          <li class="divider"></li>
-                          <li ng-repeat="category in backgrounds">
-                            <div class="dropdown-header" ng-attr-style="{{category.style}}">{{category.category}}:</div>
-                            <ul class="menu">
-                              <li ng-repeat="bg in category.content"><a ng-click='setBackground(bg)'>{{bg.name}}</a></li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Corner radii -->
-                  <div class="form-group form-group-sm">
-                    <label class="control-label text-nowrap" style='margin-left: 5px;' for="kbdradiieditor">Radii:</label>
-
-                    <div class="hint--top hint--rounded"
-                         data-hint="Specify the corner radii for this keyboard, in CSS3 format.
-
-                         Some examples:
-                         &nbsp;&bull; 20px  /*all corners rounded equally*/
-                         &nbsp;&bull; 10px 10px 10px 10px /*ditto, but less rounding*/
-                         &nbsp;&bull; 10px 10px 10px 10px / 20px 20px 20px 20px
-                         &nbsp;&bull; 40% / 20px
-                         &nbsp;&bull; 30px 30px / 40%">
-                      <input id="kbdradiieditor" class="form-control input-sm" type='text'
-                             ng-model="meta.radii"
-                             ng-change="updateMeta('radii')"
-                             ng-blur="validateMeta('radii')">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Keyboard Name -->
-            <div class="form-group form-group-sm">
-              <label class="control-label col-md-2 col-lg-1 text-nowrap" for="kbdnameeditor">Keyboard Name:</label>
-              <div class="col-md-10 col-lg-11 form-outdent hint--top hint--rounded"
-                   data-hint="Specify the name of this keyboard layout.">
-                <input id="kbdnameeditor" class="form-control input-sm" type='text'
-                       ng-model="meta.name"
-                       ng-change="updateMeta('name')"
-                       ng-blur="validateMeta('name')">
-              </div>
-            </div>
-
-            <!-- Author -->
-            <div class="form-group form-group-sm">
-              <label class="control-label col-md-2 col-lg-1 text-nowrap" for="authoreditor">Author:</label>
-              <div class="col-md-10 col-lg-11 form-outdent hint--top hint--rounded"
-                   data-hint="Specify the author of this keyboard layout.">
-                <input id="authoreditor" class="form-control input-sm" type='text'
-                       ng-model="meta.author"
-                       ng-change="updateMeta('author')"
-                       ng-blur="validateMeta('author')">
-              </div>
-            </div>
-
-            <!-- Default keyswitch options-->
-            <div class="form-group form-group-sm">
-              <label class="control-label col-md-2 col-lg-1 text-nowrap" for="defaultswitcheditor">Default switch:</label>
-
-              <!-- Default keyswitch mount style-->
-              <div class="form-inline form-outdent col-md-10 col-lg-11">
-                <div class="hint--top hint--rounded" data-hint="Specify the default mount style of switch for this keyboard layout.">
-                  <select id="defaultswitcheditor" class="form-control input-sm dropdown"
-                         ng-model="meta.switchMount"
-                         ng-change="updateMeta('switchMount')"
-                         ng-blur="validateMeta('switchMount')">
-                    <option value="">Mount Style Not Specified</option>
-                    <option ng-repeat="(k,v) in switches" value="{{k}}" ng-selected="meta.switchMount == k">{{v.name}}</option>
-                  </select>
-                </div>
-
-                <!-- Default keyswitch brand-->
-                <div class="hint--top hint--rounded"
-                     data-hint="Specify the default brand of key switch for this keyboard layout.">
-                  <select class="form-control input-sm dropdown"
-                          ng-model="meta.switchBrand"
-                          ng-change="updateMeta('switchBrand')"
-                          ng-blur="validateMeta('switchBrand')"
-                          ng-disabled="!meta.switchMount">
-                    <option value="">Brand Not Specified</option>
-                    <option ng-repeat="(k,v) in switches[meta.switchMount].brands" value="{{k}}" ng-selected="meta.switchBrand == k">{{v.name}}</option>
-                  </select>
-                </div>
-
-                <!-- Default keyswitch type-->
-                <div class=" hint--top hint--rounded"
-                     data-hint="Specify the default type of key switch for this keyboard layout.">
-                  <select class="form-control input-sm dropdown"
-                          ng-model="meta.switchType"
-                          ng-change="updateMeta('switchType')"
-                          ng-blur="validateMeta('switchType')"
-                          ng-disabled="!meta.switchMount || !meta.switchBrand">
-                    <option value="">Switch Type Not Specified</option>
-                    <option ng-repeat="v in switches[meta.switchMount].brands[meta.switchBrand].switches" value="{{v.part}}" ng-selected="meta.switchType == v.part">{{v.name + (v.feel ? ', '+v.feel : '') + (v.weight ? ', '+v.weight.toString()+' cN' : '')}}</option>
-                  </select>
-                </div>
-
-                <!-- Switch mounting -->
-                <div class="form-group form-group-sm form-horizontal">
-                  <label class="control-label text-nowrap" style='margin-left: 5px;' for="pcb">Mounted on:</label>
-                  <div class="checkbox hint--top hint--rounded" data-hint="Specify if the switches are PCB mounted.">
-                    <label style='margin-bottom: -3px;'>
-                      <input type="checkbox" id="pcb" class="checkbox"
-                            ng-model="meta.pcb"
-                            ng-change="updateMeta('pcb')"
-                            ng-blur="validateMeta('pcb')">
-                      PCB
-                    </label>
-                  </div>
-                  <div class="checkbox hint--top hint--rounded" data-hint="Specify if the switches are plate mounted.">
-                    <label style='margin-bottom: -3px;'>
-                      <input type="checkbox" id="plate"  class="checkbox"
-                            ng-model="meta.plate"
-                            ng-change="updateMeta('plate')"
-                            ng-blur="validateMeta('plate')">
-                      Plate
-                    </label>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-
-
-            <!-- Notes -->
-            <div class="form-group form-group-sm">
-              <label class="control-label col-md-2 col-lg-1 text-nowrap" for="noteseditor">Notes:</label>
-              <div class="col-md-10 col-lg-11 form-outdent">
-                <div class="hint--top hint--rounded" style="width:100%"
-                     data-hint="Specify any additional notes about this keyboard layout, e.g., links to manufacturers, colors used, additional credits, etc.  GitHub-Flavored Markdown is supported for rich formatting.">
-                  <div id="noteseditor" class="form-control"
-                       ui-ace="{mode:'markdown',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
-                       ng-model="meta.notes"
-                       ng-change="updateMeta('notes')"
-                       ng-blur="validateMeta('notes')"></div>
-                </div>
-                <div class="text-right">
-                  <div class="btn-group btn-group-xs" role="group">
-                    <button type="button" class="btn btn-success" ng-click="previewNotes()"><i class="fa fa-eye"></i> Preview</button>
-                  </div>
-                  <div class="btn-group btn-group-xs" role="group">
-                    <a class="btn btn-primary" href="https://help.github.com/articles/markdown-basics/" target='_blank'><i class="fa fa-question-circle"></i> Markdown Syntax</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- CUSTOM STYLES EDITOR -->
-        <div id="tab-customstyles" ng-class="{hidden:selTab!=3}">
-          <div ngf-drop="true" ngf-change="uploadJson($files, $event)" ngf-drag-over-class="drag-over">
-            <div id="customstyles"
-                 ui-ace="{mode:'css',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
-                 ng-model="meta.css"
-                 ng-change="updateCustomStyles()"
-                 ng-class="{error:customStylesException!==''}"></div>
-          </div>
-          <div style='text-align:right;margin-top:4px;'>
-            <div class="btn-group btn-group-xs" role="group">
-              <a class="btn btn-primary" href="https://github.com/ijprest/keyboard-layout-editor/wiki/Custom-Styles" target='_blank'><i class="fa fa-question-circle"></i> Custom Styles Syntax</a>
-            </div>
-          </div>
-          <div id="customstyles-error" class="alert alert-danger" style='margin-top:1em;margin-bottom:0px' ng-class="{hidden:!customStylesException}">{{customStylesException}}</div>
-        </div>
-
-        <!-- RAW DATA EDITOR -->
-        <div id="tab-rawdata" ng-class="{hidden:selTab!=2}">
-          <div ngf-drop="true" ngf-change="uploadJson($files, $event)" ngf-drag-over-class="drag-over">
-            <div id="rawdata"
-                 ui-ace="{mode:'json',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
-                 ng-model="serialized"
-                 ng-change="updateFromSerialized()"
-                 ng-class="{error:deserializeException!==''}"></div>
-          </div>
-          <div style='text-align:right;margin-top:4px;'>
-            <div class="btn-group btn-group-xs" role="group">
-              <button type="button" class="btn btn-success" ng-click="downloadJson()"><i class="fa fa-download"></i> Download JSON</button>
-              <button ngf-select="true" class="btn btn-success" ngf-change="uploadJson($files, $event)"><i class="fa fa-upload"></i> Upload JSON</button>
-            </div>
-            <div class="btn-group btn-group-xs" role="group">
-              <a class="btn btn-primary" href="https://github.com/ijprest/keyboard-layout-editor/wiki/Serialized-Data-Format" target='_blank'><i class="fa fa-question-circle"></i> Raw Data Syntax</a>
-            </div>
-          </div>
-          <div id="rawdata-error" class="alert alert-danger" style='margin-top:1em;margin-bottom:0px' ng-class="{hidden:!deserializeException}">{{deserializeException}}</div>
-        </div>
-
-        <!-- SUMMARY -->
-        <div id="summary" ng-class="{hidden:selTab!=4}">
-          <div class="col-md-12 col-lg-12 row">
-            Title: {{meta.name}}<br>
-            Author: {{meta.author}}<br>
-            Key sizes summary:<br>
-            <ol>
-              <li ng-repeat="(k,v) in keyCount()"><span class="fa fa-square"  ng-style="{'color':getTextColor(k)}"></span> {{k}} : {{v}}</li>
-            </ol>
-            Switches summary:<br>
-            <ol>
-              <li ng-repeat="(k,v) in switchCount()"> {{k}} : {{v}}</li>
-            </ol>
-          </div>
-        </div>
-
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <ul class="nav nav-tabs" ng-cloak>
+      <li ng-class="{active:selTab==1}"><a ng-click="selTab=1" data-toggle="tab"><i class="fa fa-keyboard-o"></i> Keyboard Properties</a></li>
+      <li ng-class="{active:selTab==3}"><a ng-click="selTab=3" data-toggle="tab"><i class="fa fa-file-text-o"></i> Custom Styles</a></li>
+      <li ng-class="{active:selTab==2}"><a ng-click="selTab=2" data-toggle="tab"><i class="fa fa-code"></i> Raw data</a></li>
+      <li ng-class="{active:selTab==4}"><a ng-click="selTab=4" data-toggle="tab"><i class="fa fa-file-text-o"></i> Summary</a></li>
+    </ul>
+    <div id="tab-content" class='col-md-12 col-lg-12 row' ui-keydown="{esc:'focusKb()'}" ng-cloak>
+
+      <!-- KEYBOARD PROPERTIES EDITOR -->
+      <div id="kbdproperties" ng-class="{hidden:selTab!=1}">
+        <form class="form-horizontal col-sm-12 col-md-12 col-lg-12">
+
+          <!-- Keyboard Background -->
+          <div class="form-group form-group-sm">
+            <label class="control-label col-md-2 col-lg-1 text-nowrap" for="kbdcoloreditor">Case Background:</label>
+            <div class="col-md-10 col-lg-11">
+              <div class="form-inline">
+                <!-- Color -->
+                <kbd-color-picker picker-id="kbdcoloreditor"
+                                  ng-model="meta.backcolor"
+                                  ng-change="updateMeta('backcolor')"
+                                  ng-blur="validateMeta('backcolor')"
+                                  hint-text="Specify the background color for the keyboard."></kbd-color-picker>
+
+                <!-- Background image-->
+                <div class="form-group form-group-sm">
+                  <div class="input-group input-group-sm hint--top hint--rounded" data-hint="Specify the background texture for the keyboard.">
+                    <div class="btn-group btn-group-sm-form" dropdown>
+                      <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{meta.background ? meta.background.name : 'No Texture'}} <b class="caret"></b></button>
+                      <ul class="dropdown-menu dropdown-select" role="menu">
+                        <li><a ng-click='setBackground()'>None</a></li>
+                        <li class="divider"></li>
+                        <li ng-repeat="category in backgrounds">
+                          <div class="dropdown-header" ng-attr-style="{{category.style}}">{{category.category}}:</div>
+                          <ul class="menu">
+                            <li ng-repeat="bg in category.content"><a ng-click='setBackground(bg)'>{{bg.name}}</a></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Corner radii -->
+                <div class="form-group form-group-sm">
+                  <label class="control-label text-nowrap" style='margin-left: 5px;' for="kbdradiieditor">Radii:</label>
+
+                  <div class="hint--top hint--rounded"
+                       data-hint="Specify the corner radii for this keyboard, in CSS3 format.
+
+                       Some examples:
+                       &nbsp;&bull; 20px  /*all corners rounded equally*/
+                       &nbsp;&bull; 10px 10px 10px 10px /*ditto, but less rounding*/
+                       &nbsp;&bull; 10px 10px 10px 10px / 20px 20px 20px 20px
+                       &nbsp;&bull; 40% / 20px
+                       &nbsp;&bull; 30px 30px / 40%">
+                    <input id="kbdradiieditor" class="form-control input-sm" type='text'
+                           ng-model="meta.radii"
+                           ng-change="updateMeta('radii')"
+                           ng-blur="validateMeta('radii')">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keyboard Name -->
+          <div class="form-group form-group-sm">
+            <label class="control-label col-md-2 col-lg-1 text-nowrap" for="kbdnameeditor">Keyboard Name:</label>
+            <div class="col-md-10 col-lg-11 form-outdent hint--top hint--rounded"
+                 data-hint="Specify the name of this keyboard layout.">
+              <input id="kbdnameeditor" class="form-control input-sm" type='text'
+                     ng-model="meta.name"
+                     ng-change="updateMeta('name')"
+                     ng-blur="validateMeta('name')">
+            </div>
+          </div>
+
+          <!-- Author -->
+          <div class="form-group form-group-sm">
+            <label class="control-label col-md-2 col-lg-1 text-nowrap" for="authoreditor">Author:</label>
+            <div class="col-md-10 col-lg-11 form-outdent hint--top hint--rounded"
+                 data-hint="Specify the author of this keyboard layout.">
+              <input id="authoreditor" class="form-control input-sm" type='text'
+                     ng-model="meta.author"
+                     ng-change="updateMeta('author')"
+                     ng-blur="validateMeta('author')">
+            </div>
+          </div>
+
+          <!-- Default keyswitch options-->
+          <div class="form-group form-group-sm">
+            <label class="control-label col-md-2 col-lg-1 text-nowrap" for="defaultswitcheditor">Default switch:</label>
+
+            <!-- Default keyswitch mount style-->
+            <div class="form-inline form-outdent col-md-10 col-lg-11">
+              <div class="hint--top hint--rounded" data-hint="Specify the default mount style of switch for this keyboard layout.">
+                <select id="defaultswitcheditor" class="form-control input-sm dropdown"
+                       ng-model="meta.switchMount"
+                       ng-change="updateMeta('switchMount')"
+                       ng-blur="validateMeta('switchMount')">
+                  <option value="">Mount Style Not Specified</option>
+                  <option ng-repeat="(k,v) in switches" value="{{k}}" ng-selected="meta.switchMount == k">{{v.name}}</option>
+                </select>
+              </div>
+
+              <!-- Default keyswitch brand-->
+              <div class="hint--top hint--rounded"
+                   data-hint="Specify the default brand of key switch for this keyboard layout.">
+                <select class="form-control input-sm dropdown"
+                        ng-model="meta.switchBrand"
+                        ng-change="updateMeta('switchBrand')"
+                        ng-blur="validateMeta('switchBrand')"
+                        ng-disabled="!meta.switchMount">
+                  <option value="">Brand Not Specified</option>
+                  <option ng-repeat="(k,v) in switches[meta.switchMount].brands" value="{{k}}" ng-selected="meta.switchBrand == k">{{v.name}}</option>
+                </select>
+              </div>
+
+              <!-- Default keyswitch type-->
+              <div class=" hint--top hint--rounded"
+                   data-hint="Specify the default type of key switch for this keyboard layout.">
+                <select class="form-control input-sm dropdown"
+                        ng-model="meta.switchType"
+                        ng-change="updateMeta('switchType')"
+                        ng-blur="validateMeta('switchType')"
+                        ng-disabled="!meta.switchMount || !meta.switchBrand">
+                  <option value="">Switch Type Not Specified</option>
+                  <option ng-repeat="v in switches[meta.switchMount].brands[meta.switchBrand].switches" value="{{v.part}}" ng-selected="meta.switchType == v.part">{{v.name + (v.feel ? ', '+v.feel : '') + (v.weight ? ', '+v.weight.toString()+' cN' : '')}}</option>
+                </select>
+              </div>
+
+              <!-- Switch mounting -->
+              <div class="form-group form-group-sm form-horizontal">
+                <label class="control-label text-nowrap" style='margin-left: 5px;' for="pcb">Mounted on:</label>
+                <div class="checkbox hint--top hint--rounded" data-hint="Specify if the switches are PCB mounted.">
+                  <label style='margin-bottom: -3px;'>
+                    <input type="checkbox" id="pcb" class="checkbox"
+                          ng-model="meta.pcb"
+                          ng-change="updateMeta('pcb')"
+                          ng-blur="validateMeta('pcb')">
+                    PCB
+                  </label>
+                </div>
+                <div class="checkbox hint--top hint--rounded" data-hint="Specify if the switches are plate mounted.">
+                  <label style='margin-bottom: -3px;'>
+                    <input type="checkbox" id="plate"  class="checkbox"
+                          ng-model="meta.plate"
+                          ng-change="updateMeta('plate')"
+                          ng-blur="validateMeta('plate')">
+                    Plate
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+          <!-- Notes -->
+          <div class="form-group form-group-sm">
+            <label class="control-label col-md-2 col-lg-1 text-nowrap" for="noteseditor">Notes:</label>
+            <div class="col-md-10 col-lg-11 form-outdent">
+              <div class="hint--top hint--rounded" style="width:100%"
+                   data-hint="Specify any additional notes about this keyboard layout, e.g., links to manufacturers, colors used, additional credits, etc.  GitHub-Flavored Markdown is supported for rich formatting.">
+                <div id="noteseditor" class="form-control"
+                     ui-ace="{mode:'markdown',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
+                     ng-model="meta.notes"
+                     ng-change="updateMeta('notes')"
+                     ng-blur="validateMeta('notes')"></div>
+              </div>
+              <div class="text-right">
+                <div class="btn-group btn-group-xs" role="group">
+                  <button type="button" class="btn btn-success" ng-click="previewNotes()"><i class="fa fa-eye"></i> Preview</button>
+                </div>
+                <div class="btn-group btn-group-xs" role="group">
+                  <a class="btn btn-primary" href="https://help.github.com/articles/markdown-basics/" target='_blank'><i class="fa fa-question-circle"></i> Markdown Syntax</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- CUSTOM STYLES EDITOR -->
+      <div id="tab-customstyles" ng-class="{hidden:selTab!=3}">
+        <div ngf-drop="true" ngf-change="uploadJson($files, $event)" ngf-drag-over-class="drag-over">
+          <div id="customstyles"
+               ui-ace="{mode:'css',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
+               ng-model="meta.css"
+               ng-change="updateCustomStyles()"
+               ng-class="{error:customStylesException!==''}"></div>
+        </div>
+        <div style='text-align:right;margin-top:4px;'>
+          <div class="btn-group btn-group-xs" role="group">
+            <a class="btn btn-primary" href="https://github.com/ijprest/keyboard-layout-editor/wiki/Custom-Styles" target='_blank'><i class="fa fa-question-circle"></i> Custom Styles Syntax</a>
+          </div>
+        </div>
+        <div id="customstyles-error" class="alert alert-danger" style='margin-top:1em;margin-bottom:0px' ng-class="{hidden:!customStylesException}">{{customStylesException}}</div>
+      </div>
+
+      <!-- RAW DATA EDITOR -->
+      <div id="tab-rawdata" ng-class="{hidden:selTab!=2}">
+        <div ngf-drop="true" ngf-change="uploadJson($files, $event)" ngf-drag-over-class="drag-over">
+          <div id="rawdata"
+               ui-ace="{mode:'json',theme:'textmate',onLoad:aceLoaded,useWrapMode:true,rendererOptions:{animatedScroll:true,showPrintMargin:false}}"
+               ng-model="serialized"
+               ng-change="updateFromSerialized()"
+               ng-class="{error:deserializeException!==''}"></div>
+        </div>
+        <div style='text-align:right;margin-top:4px;'>
+          <div class="btn-group btn-group-xs" role="group">
+            <button type="button" class="btn btn-success" ng-click="downloadJson()"><i class="fa fa-download"></i> Download JSON</button>
+            <button ngf-select="true" class="btn btn-success" ngf-change="uploadJson($files, $event)"><i class="fa fa-upload"></i> Upload JSON</button>
+          </div>
+          <div class="btn-group btn-group-xs" role="group">
+            <a class="btn btn-primary" href="https://github.com/ijprest/keyboard-layout-editor/wiki/Serialized-Data-Format" target='_blank'><i class="fa fa-question-circle"></i> Raw Data Syntax</a>
+          </div>
+        </div>
+        <div id="rawdata-error" class="alert alert-danger" style='margin-top:1em;margin-bottom:0px' ng-class="{hidden:!deserializeException}">{{deserializeException}}</div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div id="summary" ng-class="{hidden:selTab!=4}">
+        <div class="col-md-12 col-lg-12 row">
+          Title: {{meta.name}}<br>
+          Author: {{meta.author}}<br>
+          Key sizes summary:<br>
+          <ol>
+            <li ng-repeat="(k,v) in keyCount()"><span class="fa fa-square"  ng-style="{'color':getTextColor(k)}"></span> {{k}} : {{v}}</li>
+          </ol>
+          Switches summary:<br>
+          <ol>
+            <li ng-repeat="(k,v) in switchCount()"> {{k}} : {{v}}</li>
+          </ol>
+        </div>
+      </div>
+
     </div>
   </div>
   <div class="col-md-12 col-lg-12 row" style="margin-top:1em;margin-left:0px;">
